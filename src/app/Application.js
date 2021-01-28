@@ -15,9 +15,9 @@ export default class Application extends EventEmitter {
     super();
 
     this.config = config;
-    this.data = {};
-    this.universe = new StarWarsUniverse();
-
+    this.data = {
+      universe: new StarWarsUniverse()
+    };
     this.init();
   }
 
@@ -33,7 +33,7 @@ export default class Application extends EventEmitter {
    */
   async init() {
     // Initiate classes and wait for async operations here.
-    await this.universe.init()
+    await this.data.universe.init()
 
     this.emit(Application.events.APP_READY);
   }

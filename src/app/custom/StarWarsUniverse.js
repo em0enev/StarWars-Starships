@@ -8,7 +8,7 @@ export default class StarWarsUniverse {
     async init() {
         await this._getStarshipCount()
         await this._createStarships()
-        return this.theBestStarship;
+        this.theBestStarship
     }
 
     async _getStarshipCount() {
@@ -18,31 +18,37 @@ export default class StarWarsUniverse {
     }
 
     async _createStarships() {
-        for (let i = 0; i < 76; i++) { //id 75 is assigned to the last starship from API 
-            const response = await fetch(`https://swapi.dev/api/starships/${i}`);
+        const maxStarships = await this._getStarshipCount();
+        let currentIndex = 0
+        let starshipCount = 0;
+
+        while (starshipCount < Number(maxStarships)) {
+            const response = await fetch(`https://swapi.dev/api/starships/${currentIndex}`);
 
             if (!response.ok) {
+                currentIndex++;
                 continue;
             }
 
+            starshipCount++;
+            currentIndex++;
+
             const data = await response.json();
-            if(this._validateData(data)){          
+            if (this._validateData(data)) {
                 const starship = new Starship(data.name, data.consumables, data.passengers)
                 this.starships.push(starship);
             }
         }
     }
 
-    get theBestStarship(){
-        let bestShip;
-        let maxDays = 0;
-        for (const ship of this.starships) {
-            if(ship.maxDaysInSpace > maxDays){
-                maxDays = ship.maxDaysInSpace;
-                bestShip = ship;
+    get theBestStarship() {
+        return this.starships.reduce((currentShip, candidate) => {
+            if (currentShip.maxDaysInSpace > candidate.maxDaysInSpace) {
+                return currentShip
+            } else {
+                return candidate
             }
-        }
-        return bestShip;
+        })
     }
 
     _validateData(ship) {
